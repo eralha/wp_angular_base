@@ -8,7 +8,7 @@ define(['angular'], function () {
 	        $scope.name = "Emanuel Ralha";
 
 	        if(window.isAdmin && $location.url() == ''){
-				window.location = '#/all-users/';
+				window.location = '#/url-por-defeito/';
 			}
 
 	    }]);

@@ -87,21 +87,20 @@ if (!class_exists("er_base_plugin")){
 
 				//Se for admin o ecran por defeito é outro
 				if($current_user->caps["administrator"] == 1) {
-					$view = (isset($_GET["view"]))? $_GET["view"] : "list_all";
 					echo "<script>window.isAdmin = true;</script>";
 				}
 
 				//este é o menu de navegação que será sempre incluido
 				$content = file_get_contents($pluginDir."templates/backend/main.php", false);
 
-				echo "<link rel='stylesheet' href='".plugins_url( '', __FILE__ )."/css/style.css' type='text/css' />";
-				echo "<link rel='stylesheet/less' href='".plugins_url( '', __FILE__ )."/css/less/style.less' type='text/css'>";
-  				echo "<script src='".plugins_url( '', __FILE__ )."/js/libs/less-1.3.3.min.js'></script>";
+				$content .= "<link rel='stylesheet' href='".plugins_url( '', __FILE__ )."/css/style.css' type='text/css' />";
+				$content .= "<link rel='stylesheet/less' href='".plugins_url( '', __FILE__ )."/css/less/style.less' type='text/css'>";
+  				$content .= "<script src='".plugins_url( '', __FILE__ )."/js/libs/less-1.3.3.min.js'></script>";
 
-				echo "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
-				echo "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
+				$content .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
+				$content .= "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
 
-				echo "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
+				$content .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
 			}
 
 			echo $content;
@@ -115,8 +114,6 @@ if (!class_exists("er_base_plugin")){
 			$pluginDir = str_replace("", "", plugin_dir_url(__FILE__));
 			set_include_path($pluginDir);
 
-			$successMSG = "";
-			$errorMSG = "";
 			$responseHTML = "";
 
 			if(strpos($content, "[er-plugin-files]") !== false){
@@ -134,9 +131,9 @@ if (!class_exists("er_base_plugin")){
 					$responseHTML .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
 
 					$responseHTML .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
-			}
 
-			$content = str_replace("[er-plugin-files]", $responseHTML, $content);
+				$content = str_replace("[er-plugin-files]", $responseHTML, $content);
+			}
 
 			return $content;
 		}
