@@ -17,6 +17,11 @@ if (!class_exists("er_base_plugin")){
 		var $optionsName = "er_base_plugin";
 		var $dbVersion = "0.2";
 		var $path = "/account/"; //path to account pages
+		var $ajaxHoocks = array(
+		        "userLogin" => "nopriv",
+		        "userRegister" => "nopriv",
+		        "getColaborators" => "priv"
+		    );
 
 		function er_base_plugin(){
 			
@@ -67,6 +72,56 @@ if (!class_exists("er_base_plugin")){
 
 			//$tabea_ficheiros = $wpdb->prefix.$this->optionsName."_ficheiros";
 			//$wpdb->query("DROP TABLE IF EXISTS ". $tabea_ficheiros);
+		}
+
+		function configAjaxHoocks(){
+			foreach ($this->ajaxHoocks as $key => $value){
+				if($value == "priv"){
+					add_action( 'wp_ajax_'.$key, array($this, $key) );
+				}
+				if($value == "nopriv"){
+					add_action( 'wp_ajax_nopriv_'.$key, array($this, $key) );
+				}
+			}
+		}
+
+		function generateNonces(){
+			$salt = "er-plugin-nonce-";
+			$hoocks = $this->ajaxHoocks;
+			$nonces = array();
+
+			if(is_user_logged_in()){
+				global $current_user;
+
+				$current_userID = $current_user->data->ID;
+				$salt .= $current_userID;
+			}
+
+			foreach ($hoocks as $key => $value){
+				$hoocks[$key] = wp_create_nonce($salt.$key);
+
+				if(is_user_logged_in() && $value == "priv"){
+					$nonces[$key] = $hoocks[$key];
+				}
+				if($value == "nopriv"){
+					$nonces[$key] = $hoocks[$key];
+				}
+			}
+
+			return json_encode($nonces);
+		}
+
+		function verifyNonce($action){
+			$salt = "er-plugin-nonce-";
+
+			if(is_user_logged_in()){
+				global $current_user;
+
+				$current_userID = $current_user->data->ID;
+				$salt .= $current_userID;
+			}
+
+			if (!wp_verify_nonce($_POST["nonce"], $salt.$action)){ die($action); }
 		}
 
 		function printAdminPage(){
@@ -159,7 +214,8 @@ if (isset($er_base_plugin)) {
 
 		add_action('admin_menu', 'er_base_plugin_init');
 
-		add_action( 'wp_ajax_getColaborators', array($er_base_plugin, 'getAllColaborators') );
+		//Hoocking ajax functions by a array config
+		$er_base_plugin->configAjaxHoocks();
 
 
 	//Filters
