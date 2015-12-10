@@ -18,9 +18,9 @@ if (!class_exists("er_base_plugin")){
 		var $dbVersion = "0.2";
 		var $path = "/account/"; //path to account pages
 		var $ajaxHoocks = array(
-		        "userLogin" => "nopriv",
-		        "userRegister" => "nopriv",
-		        "getColaborators" => "priv"
+		        "_userLogin" => "nopriv",
+		        "_userRegister" => "nopriv",
+		        "_getColaborators" => "priv"
 		    );
 
 		function er_base_plugin(){
@@ -112,7 +112,7 @@ if (!class_exists("er_base_plugin")){
 		}
 
 		function verifyNonce($action){
-			$salt = "er-plugin-nonce-";
+			$salt = $this->nonceSalt;
 
 			if(is_user_logged_in()){
 				global $current_user;
@@ -121,7 +121,12 @@ if (!class_exists("er_base_plugin")){
 				$salt .= $current_userID;
 			}
 
-			if (!wp_verify_nonce($_POST["nonce"], $salt.$action)){ die($action); }
+			$error = array(
+				"error" => "NOT_ALLOWED",
+				"action" => $action
+			);
+
+			if (!wp_verify_nonce($_POST["nonce"], $salt.$action)){ die(json_encode($error)); }
 		}
 
 		function printAdminPage(){
@@ -134,7 +139,7 @@ if (!class_exists("er_base_plugin")){
 			$successMSG = "";
 			$errorMSG = "";
 
-			$content = "";
+			$responseHTML = "";
 
 			if(is_user_logged_in()){
 				//a view por defeito é a info
@@ -146,19 +151,20 @@ if (!class_exists("er_base_plugin")){
 				}
 
 				//este é o menu de navegação que será sempre incluido
-				$content = file_get_contents($pluginDir."templates/backend/main.php", false);
+				$responseHTML = file_get_contents($pluginDir."templates/backend/main.php", false);
 
-				$content .= "<link rel='stylesheet' href='".plugins_url( '', __FILE__ )."/css/style.css' type='text/css' />";
-				$content .= "<link rel='stylesheet/less' href='".plugins_url( '', __FILE__ )."/css/less/style.less' type='text/css'>";
-  				$content .= "<script src='".plugins_url( '', __FILE__ )."/js/libs/less-1.3.3.min.js'></script>";
+				$responseHTML .= "<link rel='stylesheet' href='".plugins_url( '', __FILE__ )."/css/style.css' type='text/css' />";
+				$responseHTML .= "<link rel='stylesheet/less' href='".plugins_url( '', __FILE__ )."/css/less/style.less' type='text/css'>";
+  				$responseHTML .= "<script src='".plugins_url( '', __FILE__ )."/js/libs/less-1.3.3.min.js'></script>";
 
-				$content .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
-				$content .= "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
+				$responseHTML .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
+				$responseHTML .= "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
+				$responseHTML .= "<script>window.nonces = ".$this->generateNonces().";</script>";
 
-				$content .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
+				$responseHTML .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
 			}
 
-			echo $content;
+			echo $responseHTML;
 		}
 
 		function addContent($content=''){
@@ -184,6 +190,7 @@ if (!class_exists("er_base_plugin")){
 
 	  				$responseHTML .= "<script>var ajaxurl = '".admin_url('admin-ajax.php')."';</script>";
 					$responseHTML .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
+					$responseHTML .= "<script>window.nonces = ".$this->generateNonces().";</script>";
 
 					$responseHTML .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
 
