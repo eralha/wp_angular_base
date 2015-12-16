@@ -15,8 +15,10 @@ if (!class_exists("er_base_plugin")){
 	class er_base_plugin{
 
 		var $optionsName = "er_base_plugin";
+		var $nonceSalt = "er-plugin-nonce-";
 		var $dbVersion = "0.2";
-		var $path = "/account/"; //path to account pages
+		var $table_menssages;
+		
 		var $ajaxHoocks = array(
 		        "_userLogin" => "nopriv",
 		        "_userRegister" => "nopriv",
@@ -24,18 +26,14 @@ if (!class_exists("er_base_plugin")){
 		    );
 
 		function er_base_plugin(){
-			
+			global $wpdb;
+
+			$table_menssages = $wpdb->prefix.$this->optionsName."_menssagens";
+
+			$this->table_menssages = $table_menssages;
 		}
 
 		function init(){
-			global $wpdb;
-			$tabea_ficheiros = $wpdb->prefix.$this->optionsName."_ficheiros";
-			$table_menssages = $wpdb->prefix.$this->optionsName."_menssagens";
-
-			$this->tabea_ficheiros = $tabea_ficheiros;
-			$this->table_menssages = $table_menssages;
-
-
 			//wp_register_script( 'angular', plugins_url( 'js/angular.js', __FILE__ ));
 
 			wp_register_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css' );
@@ -86,7 +84,7 @@ if (!class_exists("er_base_plugin")){
 		}
 
 		function generateNonces(){
-			$salt = "er-plugin-nonce-";
+			$salt = $this->nonceSalt;
 			$hoocks = $this->ajaxHoocks;
 			$nonces = array();
 
