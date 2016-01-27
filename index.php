@@ -18,12 +18,6 @@ if (!class_exists("er_base_plugin")){
 		var $nonceSalt = "er-plugin-nonce-";
 		var $dbVersion = "0.2";
 		var $table_menssages;
-		
-		var $ajaxHoocks = array(
-		        "_userLogin" => "nopriv",
-		        "_userRegister" => "nopriv",
-		        "_getColaborators" => "priv"
-		    );
 
 		function er_base_plugin(){
 			global $wpdb;
@@ -72,13 +66,13 @@ if (!class_exists("er_base_plugin")){
 			//$wpdb->query("DROP TABLE IF EXISTS ". $tabea_ficheiros);
 		}
 
-		function configAjaxHoocks(){
-			foreach ($this->ajaxHoocks as $key => $value){
+		function configAjaxHoocks($class, $hoocks){
+			foreach ($hoocks as $key => $value){
 				if($value == "priv"){
-					add_action( 'wp_ajax_'.$key, array($this, $key) );
+					add_action( 'wp_ajax_'.$key, array($class, $key) );
 				}
 				if($value == "nopriv"){
-					add_action( 'wp_ajax_nopriv_'.$key, array($this, $key) );
+					add_action( 'wp_ajax_nopriv_'.$key, array($class, $key) );
 				}
 			}
 		}
@@ -125,29 +119,6 @@ if (!class_exists("er_base_plugin")){
 			);
 
 			if (!wp_verify_nonce($_POST["nonce"], $salt.$action)){ die(json_encode($error)); }
-		}
-
-		function _userLogin(){
-			$this->verifyNonce('_userLogin');
-
-			$data = $_POST["data"];
-
-			if(!isset($data["user_login"]) || !isset($data["user_password"]) || is_user_logged_in()){
-				echo "0";
-				wp_die();
-			}
-
-			$data['remember'] = true;
-
-			$user_signon = wp_signon($data, false);
-
-			if (is_wp_error($user_signon)){
-		        echo "0";
-		    }else{
-		        echo json_encode( array('loggedin'=>true, 'ID' => $user_signon->ID) );
-		    }
-
-			wp_die();
 		}
 
 		function printAdminPage(){
@@ -243,7 +214,13 @@ if (isset($er_base_plugin)) {
 		add_action('admin_menu', 'er_base_plugin_init');
 
 		//Hoocking ajax functions by a array config
-		$er_base_plugin->configAjaxHoocks();
+		include "php__comps/ajax__calls.php";
+
+		$ajaxInterface = new ajax__component();
+
+		//Setting hoocks equal to ajax__component hoocks in order to generate the required nonces
+		$er_base_plugin->ajaxHoocks = $ajaxInterface->ajaxHoocks;
+		$er_base_plugin->configAjaxHoocks($ajaxInterface, $ajaxInterface->ajaxHoocks);
 
 
 	//Filters
