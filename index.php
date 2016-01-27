@@ -127,6 +127,29 @@ if (!class_exists("er_base_plugin")){
 			if (!wp_verify_nonce($_POST["nonce"], $salt.$action)){ die(json_encode($error)); }
 		}
 
+		function _userLogin(){
+			$this->verifyNonce('_userLogin');
+
+			$data = $_POST["data"];
+
+			if(!isset($data["user_login"]) || !isset($data["user_password"]) || is_user_logged_in()){
+				echo "0";
+				wp_die();
+			}
+
+			$data['remember'] = true;
+
+			$user_signon = wp_signon($data, false);
+
+			if (is_wp_error($user_signon)){
+		        echo "0";
+		    }else{
+		        echo json_encode( array('loggedin'=>true, 'ID' => $user_signon->ID) );
+		    }
+
+			wp_die();
+		}
+
 		function printAdminPage(){
 			global $wpdb;
 			global $current_user;
