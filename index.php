@@ -159,7 +159,7 @@ if (!class_exists("er_base_plugin")){
 			echo $responseHTML;
 		}
 
-		function addContent($content=''){
+		function addContent($atts, $content=''){
 			global $wpdb;
 			global $current_user;
 
@@ -169,7 +169,7 @@ if (!class_exists("er_base_plugin")){
 
 			$responseHTML = "";
 
-			if(strpos($content, "[er-plugin-files]") !== false){
+			//if(strpos($content, "[er-plugin-files]") !== false){
 				if(is_user_logged_in()){
 					$responseHTML .= "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
 				}
@@ -186,10 +186,10 @@ if (!class_exists("er_base_plugin")){
 
 					$responseHTML .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
 
-				$content = str_replace("[er-plugin-files]", $responseHTML, $content);
-			}
+				//$content = str_replace("[er-plugin-files]", $responseHTML, $content);
+			//}
 
-			return $content;
+			return $responseHTML;
 		}
 	}
 }
@@ -225,7 +225,8 @@ if (isset($er_base_plugin)) {
 
 	//Filters
 		//Search the content for galery matches
-		add_filter('the_content', array($er_base_plugin, 'addContent'));
+		//add_filter('the_content', array($er_base_plugin, 'addContent'));
+		add_shortcode( 'er-plugin-files', array($er_base_plugin, 'addContent' ) );
 
 	//scripts
 }
