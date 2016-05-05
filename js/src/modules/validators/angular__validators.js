@@ -9,12 +9,9 @@
         link: function(scope, element, attrs) {
 
             scope[attrs.name].$highlightFields = function(){
-                var formFields = angular.toJson(scope[attrs.name]);
-                    formFields = angular.fromJson(formFields);
-
-                    for(i in formFields){
-                        $(element).find('.ng-invalid').addClass('error');
-                    }
+                setTimeout(function(){
+                    $(element).find('.ng-invalid').addClass('error');
+                },100);
             }
             
         }
