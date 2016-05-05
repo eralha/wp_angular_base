@@ -1,4 +1,4 @@
-<div data-angular-module="module/angular/angular__module">
+<div>
 
 	Olá mundo
 

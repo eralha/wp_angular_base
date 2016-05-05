@@ -1,6 +1,5 @@
-define([], function()
-{
-
+(function(){
+    
 	var app = angular.module('formValidator', []);
 
     app.directive('formValidator', ['$timeout',
@@ -251,4 +250,4 @@ define([], function()
 
     return app;
 
-});
+})();

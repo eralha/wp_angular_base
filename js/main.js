@@ -1,19 +1,3 @@
-//requirejs configurations
-var appCFO_baseUrl = "src";
-requirejs.config({
-    baseUrl: window.pluginsDir+'/js/',
-    paths: {
-        'lib' : './libs/',
-        'module' : appCFO_baseUrl+'/modules',
-        'angular' : 'libs/angular.min',
-        'TweenLite' : './libs/greensock/TweenLite.min',
-        'plugins' : appCFO_baseUrl+'/modules/plugins'
-    },
-    priority: [
-        "plugins"
-    ]
-});
-
 function initCycleWithPager(cycleConfig, CycleSelector, PagerSelector){
     if($(CycleSelector).hasClass('cycle__noparse')){ return; }
 
@@ -123,37 +107,8 @@ var mobile = 600;
 var ipadPortrait = 768;
 var desktop = 1024;
 
-//Jquery Initialization
-require(['plugins'], function(plugins){
-
+(function(){
     $ = jQuery;
-
-    /*
-        enquire and picture fill
-    */
-    //require(['module/enquire']);
-    //require(['module/picturefill']);
-
-    //loading mobile menu module
-    require(['module/mobile__menu']);
-
-    //require dynamic Modules
-    if($("[data-pageModule]").length > 0){
-        require(["module/"+$("[data-pageModule]").attr("data-pageModule")]);        
-    }
-
-    //loading Individual components
-    $("[data-component]").each(function(){
-        parseComponent(this);
-    });
-
-    $("[data-angular-module]").each(function(){
-        var htmlElement = this;
-
-        if($(this).attr("data-init") == "false") { return; }
-
-        require([$(this).attr("data-angular-module")]);
-    });
 
     //set link to all data-href boxes
     $('[data-href]').click(function(){
@@ -173,4 +128,4 @@ require(['plugins'], function(plugins){
         });
     })(jQuery);
 
-});
+})();

@@ -142,18 +142,20 @@ if (!class_exists("er_base_plugin")){
 					echo "<script>window.isAdmin = true;</script>";
 				}
 
-				//este é o menu de navegação que será sempre incluido
-				$responseHTML = file_get_contents($pluginDir."templates/backend/main.php", false);
+				$responseHTML .= "<div er-backend-base-dir></div>";
 
 				$responseHTML .= "<link rel='stylesheet' href='".plugins_url( '', __FILE__ )."/css/style.css' type='text/css' />";
 				$responseHTML .= "<link rel='stylesheet/less' href='".plugins_url( '', __FILE__ )."/css/less/style.less' type='text/css'>";
   				$responseHTML .= "<script src='".plugins_url( '', __FILE__ )."/js/libs/less-1.3.3.min.js'></script>";
 
+  				$responseHTML .= "<script>var ajaxurl = '".admin_url('admin-ajax.php')."';</script>";
 				$responseHTML .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
-				$responseHTML .= "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
 				$responseHTML .= "<script>window.nonces = ".$this->generateNonces().";</script>";
 
-				$responseHTML .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
+				$responseHTML .= "<script src='".plugins_url( '', __FILE__ )."/js/libs/angular.min.js'></script>";
+				$responseHTML .= "<script src='".plugins_url( '', __FILE__ )."/js/dist/main.min.js?v=1'></script>";
+
+				$responseHTML .= "<script>angular.bootstrap(document, ['backend']);</script>";
 			}
 
 			echo $responseHTML;
@@ -173,8 +175,8 @@ if (!class_exists("er_base_plugin")){
 				if(is_user_logged_in()){
 					$responseHTML .= "<script>window.currentUserId = '".$current_user->data->ID."';</script>";
 				}
-					//este é o menu de navegação que será sempre incluido
-					$responseHTML .= file_get_contents($pluginDir."templates/frontend/main.php", false);
+
+					$responseHTML .= "<div er-frontend-base-dir></div>";
 
 					$responseHTML .= "<link rel='stylesheet' href='".plugins_url( '', __FILE__ )."/css/style.css' type='text/css' />";
 					$responseHTML .= "<link rel='stylesheet/less' href='".plugins_url( '', __FILE__ )."/css/less/style.less' type='text/css'>";
@@ -184,7 +186,10 @@ if (!class_exists("er_base_plugin")){
 					$responseHTML .= "<script>window.pluginsDir = '".plugins_url( '', __FILE__ )."';</script>";
 					$responseHTML .= "<script>window.nonces = ".$this->generateNonces().";</script>";
 
-					$responseHTML .= "<script data-main='".plugins_url( '', __FILE__ )."/js/main' src='".plugins_url( '', __FILE__ )."/js/libs/require.js'></script>";
+					$responseHTML .= "<script src='".plugins_url( '', __FILE__ )."/js/libs/angular.min.js'></script>";
+					$responseHTML .= "<script src='".plugins_url( '', __FILE__ )."/js/dist/main.min.js?v=1'></script>";
+
+					$responseHTML .= "<script>angular.bootstrap(document, ['frontend']);</script>";
 
 				//$content = str_replace("[er-plugin-files]", $responseHTML, $content);
 			//}
